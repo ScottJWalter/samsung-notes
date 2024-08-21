@@ -3,6 +3,9 @@
 # Dependency directories
 node_modules/
 
+# local data link
+data/
+
 # TypeScript cache
 *.tsbuildinfo
 
