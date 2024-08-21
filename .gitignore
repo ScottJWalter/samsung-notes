@@ -4,7 +4,7 @@
 node_modules/
 
 # local data link
-data/
+data
 
 # TypeScript cache
 *.tsbuildinfo
