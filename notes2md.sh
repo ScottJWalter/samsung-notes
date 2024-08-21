@@ -25,7 +25,7 @@
 #   2024-08-21
 #
 # Version:
-#   0.8.0
+#   1.0.0
 #
 # License:
 #   MIT
@@ -50,6 +50,9 @@ DIR_WORK="./data/work"
 
 # (optional) -- Clean out DIR_WORK
 rm -rf ${DIR_WORK}/* && mkdir -p ${DIR_WORK}
+
+# (optional) -- Replace all spaces with underscores in filenames
+(cd ${DIR_IN} && for f in *\ *; do mv "$f" "${f// /_}"; done)
 
 # loop the DIR_IN directory
 for pdf in ${DIR_IN}/*.pdf; do
