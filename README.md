@@ -10,9 +10,18 @@ There are two ways to use this project:
 
 ## Using `notes2md.sh`
 
-1. Install Poppler
-2. Create your `DIR_IN`, `DIR_OUT`, and `DIR_WORK` folders and update the script with those paths.
-3. Launch Samsung Notes (NOTE:  The 'hack' to get Notes working on non-Samsung platforms like Windows works perfectly for this.)
+1. Install [Poppler](https://poppler.freedesktop.org/)
+
+2. Create your `DIR_IN`, `DIR_OUT`, and `DIR_WORK` folders and update the script with those paths.  Right now, there's a line below that requires these directories to be related (have the same parent):
+
+```
+     data\
+        +in\ (DIR_IN)
+        +out\ (DIR_OUT)
+        +work\ (DIR_WORK)
+```
+
+3. Launch Samsung Notes (NOTE:  The [hack](https://github.com/ChristianAndrango/Samsung-Notes) to get Notes working on non-Samsung platforms like Windows works perfectly for this.)
 4. Select the notes you wish to extract
 5. From the hamburger menu, select 'Save as file'.  This doesn't pack all notes into a single file, it creates one file per note.
 6. When prompted, select `DIR_IN` as the destination folder.
@@ -24,9 +33,15 @@ When done, the `DIR_IN` folder will be empty, and the `DIR_OUT` folder will have
 
 At this point, you can do what you want with the files, but that's beyond the scope of this converter.
 
+### Caveat(s)
+
+* The generated PDF (for that matter, any of the output formats) doesn't push any metadata from the note out.
+* The timestamp in the filename is the time the PDF *was generated*, **not** when the note was originally created.  
+* Metadata is buried inside the SQLite DB  Notes uses, which I haven't dug into (yet).
+
 ## Using the nodejs app
 
-**This is still WIP**
+_**This is still WIP**_
 
 ### Usage
 
