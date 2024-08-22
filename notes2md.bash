@@ -25,7 +25,7 @@
 #   2024-08-21
 #
 # Version:
-#   1.6.0
+#   1.9.0
 #
 # License:
 #   MIT
@@ -86,19 +86,23 @@ notes_2_markdown()
 title: $basename
 slug: $basename
 created: $timestamp
+updated: $timestamp
 ---
-# ${basename}
+# $basename
 
 ## Original PDF file
-* [$fullname](./$assets/$fullname)
+* [${fullname}](./${assets}/${fullname})
 
 ## Pages
 EOF
 
         # loop through generated png files, build list
         for png in ${data}/${assets}/*.png; do
+            local fname="$(basename $png)"
+            local bname="$(basename $png .png)"
             cat << EOF >> ${data}/${basename}.md
-* [$(basename $png .png)](./${assets}/$(basename $png))
+* [${bname}](./${assets}/${fname})
+[![${fname}](./${assets}/${fname} "${bname}")](./${assets}/${fname})
 EOF
         done
 
