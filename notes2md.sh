@@ -16,7 +16,7 @@
 #   - poppler
 # 
 # Usage:
-#   ./notes2md.sh
+#   ./notes2md.sh <data>
 #
 # Author:
 #   Scott Walter <sjwalter@gmail.com>
@@ -25,58 +25,57 @@
 #   2024-08-21
 #
 # Version:
-#   1.0.0
+#   1.6.0
 #
 # License:
 #   MIT
 #------------------------------------------------------------------------------
 #
+notes_2_markdown() 
+{
+    # Get the data directory
+    local data_root=$1
 
-# Global variables
-#
-# NOTE:  There are references below that assume that the "data" directory
-# has the following structure:
-#
-#   data/
-#   ├── in/
-#   ├── out/
-#   └── work/
-#
-# If you change this, you'll need to update the references below.
-# 
-DIR_IN="./data/in"
-DIR_OUT="./data/out"
-DIR_WORK="./data/work"
+    local DIR_IN="${data_root}/in"
+    local DIR_OUT="${data_root}/out"
+    local DIR_WORK="${data_root}/work"
 
-# (optional) -- Clean out DIR_WORK
-rm -rf ${DIR_WORK}/* && mkdir -p ${DIR_WORK}
+    echo "Samsung Notes 2 Markdown"
+    echo "========================="
+    echo "Input directory: ${DIR_IN}"
+    echo "Working directory: ${DIR_WORK}"
+    echo "Output directory: ${DIR_OUT}"
+    echo "========================="
 
-# (optional) -- Replace all spaces with underscores in filenames
-(cd ${DIR_IN} && for f in *\ *; do mv "$f" "${f// /_}"; done)
+    # (optional) -- Clean out DIR_WORK
+    rm -rf ${DIR_WORK}/* && mkdir -p ${DIR_WORK}
 
-# loop the DIR_IN directory
-for pdf in ${DIR_IN}/*.pdf; do
-	timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    fullname="$(basename ${pdf})"
-    basename="$(basename ${pdf} .pdf)"
-    assets="${basename}_assets"
-    data="${DIR_WORK}/${basename}"
+    # (optional) -- Replace all spaces with underscores in filenames
+    (cd ${DIR_IN} && for f in *\ *; do mv "$f" "${f// /_}"; done)
 
-    echo "Processing ${fullname}..."
+    # loop the DIR_IN directory
+    for pdf in ${DIR_IN}/*.pdf; do
+        local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+        local fullname="$(basename ${pdf})"
+        local basename="$(basename ${pdf} .pdf)"
+        local assets="${basename}_assets"
+        local data="${DIR_WORK}/${basename}"
 
-    # reset processing directory (if present)
-    rm -rf ${data} && mkdir -p ${data}/${assets}
+        echo "Processing ${fullname}..."
+
+        # reset processing directory (if present)
+        rm -rf ${data} && mkdir -p ${data}/${assets}
 	
-	# move file to processing directory
-	mv ${pdf} ${data}/${assets}
+        # move file to processing directory
+        mv ${pdf} ${data}/${assets}
 	
-	# convert to png file(s)
-    echo "   -> generating png files..."
-	pdftoppm -png ${data}/${assets}/${fullname} ${data}/${assets}/${basename}
+        # convert to png file(s)
+        echo "   -> generating png files..."
+        pdftoppm -png ${data}/${assets}/${fullname} ${data}/${assets}/${basename}
 	
-	# generate markdown file
-    echo "   -> generating markdown..."
-	cat << EOF > ${data}/${basename}.md
+        # generate markdown file
+        echo "   -> generating markdown..."
+        cat << EOF > ${data}/${basename}.md
 ---
 title: $basename
 slug: $basename
@@ -90,36 +89,34 @@ created: $timestamp
 ## Pages
 EOF
 
-    # loop through generated png files, build list
-    for png in ${data}/${assets}/*.png; do
-        cat << EOF >> ${data}/${basename}.md
+        # loop through generated png files, build list
+        for png in ${data}/${assets}/*.png; do
+            cat << EOF >> ${data}/${basename}.md
 * [$(basename $png .png)](./${assets}/$(basename $png))
 EOF
+        done
+
+        # zip up the bundle into DIR_OUT.  It creates a
+        # subshell, setting the root directory of the
+        # zip file to ${data}.
+        echo "   -> zipping..."
+        (cd ${data} && zip -qq -r ../../out/${basename}.zip .)
+
+        # clean up work diretory
+        rm -rf ${data}
+        echo "   -> done!"
     done
 
-    # zip up the bundle into DIR_OUT.  It creates a
-    # subshell, setting the root directory of the
-    # zip file to ${data}.
-    #
-    # NOTE:  This assumes the directory structure
-    # as defined above.  If you change the directory
-    # structure, you'll need to change this.
-    echo "   -> zipping..."
-    (cd ${data} && zip -qq -r ../../out/${basename}.zip .)
+    echo "========================="
+    echo "ALL DONE!"
+}
 
-    # clean up work diretory
-    rm -rf ${data}
-    echo "   -> done!"
-done
+###
+# MAIN
+###
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <data_root>"
+    exit 1
+fi
 
-# clean up
-unset DIR_IN
-unset DIR_OUT
-unset DIR_WORK
-unset timestamp
-unset fullname
-unset basename
-unset data
-unset assets
-
-echo "ALL DONE!"
+notes_2_markdown $1

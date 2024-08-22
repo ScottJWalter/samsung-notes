@@ -13,12 +13,6 @@
 # Example:
 #   ./send2vault.sh ~/samsung-notes/data/out ~/Obsidian/vaults/myvault/MySamsungNotes
 #
-usage()
-{
-    echo "Usage: $0 <source> <dest>"
-    exit 1
-}
-
 send_2_vault()
 {
     source=$1
@@ -29,21 +23,23 @@ send_2_vault()
         source=$(find $source -name "*.zip")
     fi
 
+    echo "Sending to Vault..."
+
     # loop over the $source files
     for zip_file in $source; do
         echo "   -> Adding ${zip_file}..."
         unzip $zip_file -d $dest
     done
+
+    echo "...DONE!"
 }
 
 ###
 # MAIN
 ###
 if [ $# -eq 0 ]; then
-    usage
+    echo "Usage: $0 <source> <dest>"
     exit 1
 fi
 
-echo "Sending to Vault..."
 send_2_vault $1 $2
-echo "...DONE!"
